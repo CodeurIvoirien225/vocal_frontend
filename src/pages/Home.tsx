@@ -23,7 +23,7 @@ const Home: React.FC = () => {
           <div className="w-full md:w-1/3 flex justify-center">
             <div className="relative w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-xl">
               <img
-                src="src/pages/ma_photo.jpg"
+                src="src/pages/photo.jpg"
                 alt="El ABASS ABDOUL ANZIZ KONE"
                 className="w-full h-full object-cover"
               />
