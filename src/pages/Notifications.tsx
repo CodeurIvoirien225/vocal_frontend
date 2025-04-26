@@ -265,7 +265,7 @@ export default function Notifications() {
               </button>
               <button
                 onClick={() => {
-                  navigate('/');
+                  navigate('/feed');
                   setMobileMenuOpen(false);
                 }}
                 className="flex items-center gap-2 w-full px-3 py-2 rounded-md text-sm text-gray-700 hover:bg-gray-100"

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mic } from 'lucide-react';
+import { Mic, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Register() {
@@ -20,7 +20,7 @@ export default function Register() {
     }
     try {
       await register(username, email, password);
-      navigate('/');
+      navigate('/feed');
     } catch (err) {
       setError('Une erreur est survenue lors de l\'inscription');
     }
@@ -33,6 +33,18 @@ export default function Register() {
         <div className="flex items-center justify-center mb-8">
           <Mic className="h-10 w-10 text-indigo-600" />
           <h1 className="ml-2 text-3xl font-bold text-gray-900">Vocal_Platform</h1>
+        </div>
+
+
+        {/* Bouton Retour à l'accueil */}
+        <div className="mb-4">
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Retour à la page d'accueil
+          </Link>
         </div>
 
         {/* Formulaire adapté */}

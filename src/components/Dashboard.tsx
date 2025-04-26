@@ -262,55 +262,60 @@ const handleUpdateUser = async () => {
         fetchDashboardData();
     }, [user, navigate]);
 
-
     const fetchDashboardData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-    
-        const [statsRes, messagesRes] = await Promise.all([
-          fetch('https://p6-groupeb.com/abass/backend/api/stats.php', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+        try {
+            setLoading(true);
+            setError(null);
+
+            const [statsRes, messagesRes] = await Promise.all([
+                fetch('https://p6-groupeb.com/abass/backend/api/stats.php', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                }),
+                fetch('https://p6-groupeb.com/abass/backend/api/messages.php?user_only=true', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                })
+            ]);
+
+            if (!statsRes.ok) throw new Error('Stats fetch failed');
+            if (!messagesRes.ok) throw new Error('Messages fetch failed');
+
+            const statsData: StatsData = await statsRes.json();
+            
+            const messagesData = await messagesRes.json();
+
+
+            if (statsData.success && statsData.data) {
+                setStats({
+                    total_messages: statsData.data.messages || 0,
+                    total_likes: statsData.data.likes || 0,
+                    total_comments: statsData.data.comments || 0,
+                    total_shares: statsData.data.shares || 0
+                });
             }
-          }),
-          fetch('https://p6-groupeb.com/abass/backend/api/messages.php', {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          })
-        ]);
-    
-        if (!statsRes.ok) throw new Error('Stats fetch failed');
-        if (!messagesRes.ok) throw new Error('Messages fetch failed');
-    
-        const statsData: StatsData = await statsRes.json();
-        const allMessages = await messagesRes.json();
-    
-        // Filtrage explicite par user_id
-        const userMessages = allMessages.messages.filter((msg: UserMessage) => 
-          msg.user_id === user?.id
-        );
-    
-        if (statsData.success && statsData.data) {
-          setStats({
-            total_messages: userMessages.length, // Utilisez le compte filtré
-            total_likes: statsData.data.likes || 0,
-            total_comments: statsData.data.comments || 0,
-            total_shares: statsData.data.shares || 0
-          });
+
+            
+
+            setMessages(messagesData.messages || []);
+
+        } catch (err) {
+            console.error('Fetch error:', err);
+            setError('Erreur lors du chargement des données');
+            setStats({
+                total_messages: 0,
+                total_likes: 0,
+                total_comments: 0,
+                total_shares: 0
+            });
+            setMessages([]);
+        } finally {
+            setLoading(false);
         }
-    
-        setMessages(userMessages);
-    
-      } catch (err) {
-        console.error('Fetch error:', err);
-        setError('Erreur lors du chargement des données');
-        setMessages([]);
-      } finally {
-        setLoading(false);
-      }
     };
+
 
     const handleDeleteClick = (messageId: number) => {
       setModalState({
@@ -388,7 +393,7 @@ const handleUpdateUser = async () => {
             {/* Navigation desktop (inchangée) */}
             <div className="hidden sm:flex items-center gap-4">
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/feed')}
                 className="text-gray-600 hover:text-gray-800 px-3 py-1 rounded-md flex items-center gap-1"
               >
                 <Home className="h-5 w-5" />
@@ -420,7 +425,7 @@ const handleUpdateUser = async () => {
               )}
               <button
                 onClick={() => {
-                  navigate('/');
+                  navigate('/feed');
                   setMobileMenuOpen(false);
                 }}
                 className="flex items-center text-gray-600 hover:text-gray-800"
@@ -539,7 +544,7 @@ const handleUpdateUser = async () => {
         <div>
           <h3 className="text-lg font-medium mb-4">Mes Publications Audio</h3>
           <button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/feed')}
             className="text-indigo-600 hover:text-indigo-800 text-sm flex items-center"
           >
             <Home className="h-4 w-4 mr-1" />
@@ -552,7 +557,7 @@ const handleUpdateUser = async () => {
               <h4 className="mt-2 text-sm font-medium text-gray-900">Aucune publication</h4>
               <p className="mt-1 text-sm text-gray-500">Commencez par publier votre premier message audio.</p>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/feed')}
                 className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
               >
                 Publier un message
