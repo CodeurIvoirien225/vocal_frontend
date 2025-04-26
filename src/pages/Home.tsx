@@ -8,7 +8,7 @@ const Home: React.FC = () => {
       {/* Header */}
       <header className="py-12 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-blue-600 mb-4">
-          Bienvenue sur <span className="text-indigo-700">Vocal Platform</span>
+          Bienvenue sur <span className="text-indigo-700">Vocal Plateform</span>
         </h1>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
           La plateforme qui donne une voix à vos idées
@@ -37,11 +37,10 @@ const Home: React.FC = () => {
             </h2>
             <div className="space-y-4 text-gray-700">
               <p>
-                Je m'appelle [Votre Nom], développeur passionné et créateur de Vocal Platform.
+                Je m'appelle El abass abdoul anziz kone, développeur passionné et créateur de Vocal Plateform.
               </p>
               <p>
-                Avec plus de [X] années d'expérience dans le développement web, j'ai conçu cette plateforme pour répondre au besoin de [expliquer le besoin que comble votre application].
-              </p>
+              Animé par une grande passion pour le développement web, j'ai conçu cette plateforme pour permettre aux utilisateurs d'envoyer facilement des messages vocaux, en simplifiant la communication rapide et naturelle.              </p>
               <p>
                 Mon objectif est de créer des solutions technologiques qui simplifient la vie des utilisateurs tout en offrant une expérience intuitive et agréable.
               </p>
@@ -59,8 +58,8 @@ const Home: React.FC = () => {
             <div>
               <h3 className="text-xl font-semibold text-gray-700 mb-4">Qu'est-ce que c'est ?</h3>
               <p className="text-gray-600">
-                Vocal Platform est une application innovante qui permet aux utilisateurs de [décrivez brièvement la fonction principale]. 
-                Notre plateforme offre une solution unique pour [expliquer le problème résolu].
+              Vocal Plateform est une application innovante qui permet aux utilisateurs d'envoyer facilement des messages vocaux.
+              Notre plateforme offre une solution unique pour simplifier et accélérer les échanges vocaux, en rendant la communication plus naturelle, plus rapide et plus accessible que jamais.
               </p>
             </div>
             
@@ -73,12 +72,9 @@ const Home: React.FC = () => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-500 mr-2">✓</span>
-                  <span>Interaction communautaire via commentaires audio</span>
+                  <span>Interaction communautaire via commentaires audio et texte</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span>Personnalisation du profil utilisateur</span>
-                </li>
+              
                 <li className="flex items-start">
                   <span className="text-green-500 mr-2">✓</span>
                   <span>Notifications en temps réel</span>
@@ -112,7 +108,7 @@ const Home: React.FC = () => {
 
       {/* Footer */}
       <footer className="py-8 text-center text-gray-500 border-t border-gray-200 mt-12">
-        <p>© {new Date().getFullYear()} Vocal Platform. Tous droits réservés.</p>
+        <p>© {new Date().getFullYear()} Vocal Platform. El abass abdoul anziz kone</p>
       </footer>
     </div>
   );

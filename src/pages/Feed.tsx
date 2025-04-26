@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, LogOut, Mic, BarChart2, Menu, X } from 'lucide-react';
+import { Bell, LogOut, Mic, BarChart2, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { VocalMessage as VocalMessageType } from '../types';
@@ -13,8 +13,9 @@ export default function Feed() {
   const [messages, setMessages] = useState<VocalMessageType[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // État pour le menu mobile
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const messagesPerPage = 5;
 
   useEffect(() => {
     if (!user) {
@@ -24,12 +25,8 @@ export default function Feed() {
     fetchMessages();
   }, [user, navigate]);
 
-  useEffect(() => {
-    fetchMessages();
-  }, []);
-
-
   const fetchMessages = async () => {
+    setLoading(true);
     try {
       const response = await fetch('https://p6-groupeb.com/abass/backend/api/messages.php', {
         headers: {
@@ -37,11 +34,21 @@ export default function Feed() {
         }
       });
       const data = await response.json();
-      if (data.messages) setMessages(data.messages);
+      if (data.messages) {
+        setMessages(data.messages);
+      }
     } catch (err) {
       console.error('Fetch error:', err);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Calcul des messages à afficher pour la page courante
+  const indexOfLastMessage = currentPage * messagesPerPage;
+  const indexOfFirstMessage = indexOfLastMessage - messagesPerPage;
+  const currentMessages = messages.slice(indexOfFirstMessage, indexOfLastMessage);
+  const totalPages = Math.ceil(messages.length / messagesPerPage);
 
   const handleAudioRecorded = async (blob: Blob) => {
     const formData = new FormData();
@@ -58,6 +65,8 @@ export default function Feed() {
       const data = await response.json();
       if (data.success) {
         fetchMessages();
+        // Revenir à la première page après l'ajout d'un nouveau message
+        setCurrentPage(1);
       }
     } catch (err) {
       console.error('Error uploading audio:', err);
@@ -81,13 +90,10 @@ export default function Feed() {
         if (!response.ok) {
             throw new Error('Erreur serveur');
         }
-
-        // Optionnel: Recharger les messages si nécessaire
-        // fetchMessages();
     } catch (error) {
         console.error("Erreur:", error);
     }
-};
+  };
 
   const handleComment = async (messageId: number, content: string, isAudio: boolean) => {
     try {
@@ -104,7 +110,6 @@ export default function Feed() {
             })
         });
 
-        // Vérification cruciale du Content-Type
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
             const text = await response.text();
@@ -117,14 +122,12 @@ export default function Feed() {
             throw new Error(data.error || 'Erreur inconnue du serveur');
         }
 
-        fetchMessages(); // Rafraîchir après succès
-
+        fetchMessages();
     } catch (err) {
         console.error('Error adding comment:', err);
-        // Afficher une notification à l'utilisateur si nécessaire
         alert('Erreur lors de l\'ajout du commentaire. Veuillez réessayer.');
     }
-};
+  };
 
   const handleReport = async (messageId: number) => {
     try {
@@ -145,9 +148,21 @@ export default function Feed() {
     }
   };
 
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 relative">
-     <header className="bg-white shadow sticky top-0 z-10">
+      <header className="bg-white shadow sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -157,7 +172,6 @@ export default function Feed() {
               </h1>
             </div>
             
-            {/* Bouton hamburger pour mobile */}
             <button
               className="sm:hidden text-gray-600 hover:text-gray-800"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -165,7 +179,6 @@ export default function Feed() {
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
 
-            {/* Navigation desktop (inchangée) */}
             <div className="hidden sm:flex items-center gap-4">
               {user && (
                 <span className="text-gray-700 font-medium">
@@ -195,7 +208,6 @@ export default function Feed() {
           </div>
         </div>
 
-        {/* Menu mobile */}
         {mobileMenuOpen && (
           <div className="sm:hidden bg-white py-4 px-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4">
@@ -243,7 +255,7 @@ export default function Feed() {
           <div>Chargement...</div>
         ) : (
           <div className="space-y-6">
-            {messages.map((message) => (
+            {currentMessages.map((message) => (
               <VocalMessage
                 key={message.id}
                 message={message}
@@ -252,6 +264,33 @@ export default function Feed() {
                 onReport={handleReport}
               />
             ))}
+
+            {/* Pagination */}
+            {messages.length > messagesPerPage && (
+              <div className="flex justify-between items-center mt-8">
+                <button
+                  onClick={goToPrevPage}
+                  disabled={currentPage === 1}
+                  className={`flex items-center px-4 py-2 rounded-md ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-indigo-600 hover:bg-indigo-50'}`}
+                >
+                  <ChevronLeft className="h-5 w-5 mr-1" />
+                  Précédent
+                </button>
+                
+                <span className="text-gray-600">
+                  Page {currentPage} sur {totalPages}
+                </span>
+                
+                <button
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`flex items-center px-4 py-2 rounded-md ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-indigo-600 hover:bg-indigo-50'}`}
+                >
+                  Suivant
+                  <ChevronRight className="h-5 w-5 ml-1" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </main>
