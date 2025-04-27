@@ -93,13 +93,11 @@ const login = async (email: string, password: string) => {
     const data = await response.json();
     
     if (!response.ok) {
-      // Si le backend retourne une erreur spécifique (email ou password)
-      if (data.error === 'email') {
-        throw new Error('email'); // Erreur spécifique pour l'email
-      } else if (data.error === 'password') {
-        throw new Error('password'); // Erreur spécifique pour le mot de passe
+      // Si le backend retourne une erreur structurée
+      if (data.error === 'email' || data.error === 'password') {
+        throw new Error(data.error); // On propage juste le type d'erreur
       } else {
-        throw new Error(data.error || 'Erreur de connexion');
+        throw new Error(data.message || 'Erreur de connexion');
       }
     }
 
@@ -116,7 +114,6 @@ const login = async (email: string, password: string) => {
     throw error; // Important: propager l'erreur pour la gérer dans Login.tsx
   }
 };
-
 
 
   // Fonction d'inscription
