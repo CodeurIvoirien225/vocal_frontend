@@ -7,6 +7,10 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  build: {
+    outDir: 'dist', // Dossier de sortie
+    emptyOutDir: true // Vide le dossier avant chaque build
+  }
 });
 
 export const API_URL = "https://vocal-backend.onrender.com"; // À remplacer après déploiement
