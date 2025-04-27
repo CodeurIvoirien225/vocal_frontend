@@ -12,6 +12,7 @@ import Home from './pages/Home';
 function App() {
   return (
     <AuthProvider>
+       <Router basename="/"></Router>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />

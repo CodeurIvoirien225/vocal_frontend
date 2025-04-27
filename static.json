@@ -1,5 +1,10 @@
 {
-    "routes": {
-      "/*": "/index.html"
+  "routes": {
+    "/*": "/index.html"
+  },
+  "headers": {
+    "/*": {
+      "Cache-Control": "no-cache"
     }
   }
+}
