@@ -93,13 +93,13 @@ const login = async (email: string, password: string) => {
     const data = await response.json();
     
     if (!response.ok) {
-      // Si le backend retourne une erreur spécifique (email ou password)
+      // Si le backend retourne une erreur spécifique
       if (data.error === 'email') {
-        throw new Error('email'); // Erreur spécifique pour l'email
+        throw new Error('email'); // Propage l'erreur spécifique
       } else if (data.error === 'password') {
-        throw new Error('password'); // Erreur spécifique pour le mot de passe
+        throw new Error('password'); // Propage l'erreur spécifique
       } else {
-        throw new Error(data.error || 'Erreur de connexion');
+        throw new Error(data.message || 'Erreur de connexion');
       }
     }
 
@@ -113,7 +113,7 @@ const login = async (email: string, password: string) => {
     }
   } catch (error) {
     console.error('Login error:', error);
-    throw error; // Important: propager l'erreur pour la gérer dans Login.tsx
+    throw error; // Propage l'erreur pour la gérer dans le composant
   }
 };
 

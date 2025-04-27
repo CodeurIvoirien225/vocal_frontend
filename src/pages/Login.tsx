@@ -11,7 +11,6 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError('');
@@ -21,30 +20,17 @@ export default function Login() {
       await login(email, password);
       navigate('/feed');
     } catch (err: any) {
-      console.error('Login error:', err); // Pour débogage
+      console.error('Login error:', err);
       
-      if (err.message.includes('Failed to fetch') || err.message.includes('404')) {
-        // Erreur serveur - afficher sous email
-        setEmailError('Service temporairement indisponible');
-      } 
-      else if (err.message.includes('email') || err.message.includes('Email')) {
-        // Erreur email spécifique
+      // Gestion spécifique des erreurs
+      if (err.message === 'email') {
         setEmailError('Email incorrect ou inexistant');
-        setPasswordError(''); // Effacer l'erreur mot de passe
-      }
-      else if (err.message.includes('password') || err.message.includes('Mot de passe')) {
-        // Erreur mot de passe spécifique
+      } else if (err.message === 'password') {
         setPasswordError('Mot de passe incorrect');
-        setEmailError(''); // Effacer l'erreur email
-      }
-      else if (err.message.includes('401') || err.message.includes('Invalid credentials')) {
-        // Cas où on ne sait pas lequel est incorrect
-        setEmailError('Email ou mot de passe incorrect');
-        setPasswordError('Email ou mot de passe incorrect');
-      }
-      else {
-        // Erreur générique
-        setEmailError('Une erreur inattendue est survenue');
+      } else if (err.message.includes('Failed to fetch')) {
+        setEmailError('Problème de connexion au serveur');
+      } else {
+        setEmailError('Une erreur est survenue lors de la connexion');
       }
     }
   };
