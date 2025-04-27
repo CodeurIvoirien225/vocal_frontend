@@ -90,7 +90,7 @@ const login = async (email: string, password: string) => {
       body: JSON.stringify({ email, password })
     });
 
-    // Première lecture du texte de la réponse
+    // D'abord lire le texte de la réponse
     const responseText = await response.text();
     let data;
     
@@ -102,20 +102,25 @@ const login = async (email: string, password: string) => {
     }
 
     if (!response.ok) {
-      // Gestion spécifique des erreurs du backend
+      // Maintenant on vérifie la structure exacte de l'erreur
       if (data.error === 'email') {
-        throw new Error('email'); // Spécifique à l'email
+        throw new Error('email');
       } else if (data.error === 'password') {
-        throw new Error('password'); // Spécifique au mot de passe
+        throw new Error('password');
       } else {
-        throw new Error(data.message || 'Erreur de connexion');
+        // Fallback pour les autres erreurs 401
+        throw new Error(data.error || 'invalid_credentials');
       }
     }
 
-    // Suite du traitement en cas de succès...
+    if (data.token && data.user) {
+      // Traitement de la connexion réussie...
+    } else {
+      throw new Error('Données de connexion incomplètes');
+    }
   } catch (error) {
     console.error('Login API error:', error);
-    throw error; // Important: propager l'erreur
+    throw error;
   }
 };
 

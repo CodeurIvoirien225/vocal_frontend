@@ -22,20 +22,24 @@ export default function Login() {
     } catch (err: any) {
       console.error('Login error details:', err);
       
-      // Gestion précise des types d'erreur
       if (err.message === 'email') {
         setEmailError('Email incorrect ou inexistant');
+        setPasswordError(''); // Effacer l'erreur mot de passe
       } 
       else if (err.message === 'password') {
         setPasswordError('Mot de passe incorrect');
+        setEmailError(''); // Effacer l'erreur email
+      }
+      else if (err.message === 'invalid_credentials') {
+        // Cas de fallback si le backend change son comportement
+        setEmailError('Email ou mot de passe incorrect');
+        setPasswordError('Email ou mot de passe incorrect');
       }
       else if (err.message.includes('Failed to fetch')) {
         setEmailError('Problème de connexion au serveur');
       }
       else {
-        // Pour les autres erreurs 401 non spécifiques
-        setEmailError('Identifiants incorrects');
-        setPasswordError('Identifiants incorrects');
+        setEmailError('Une erreur est survenue lors de la connexion');
       }
     }
   };
