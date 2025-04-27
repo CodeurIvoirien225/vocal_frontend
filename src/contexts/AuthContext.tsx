@@ -93,12 +93,10 @@ const login = async (email: string, password: string) => {
     const data = await response.json();
     
     if (!response.ok) {
-      // Si le backend retourne une erreur structurée
-      if (data.error === 'email' || data.error === 'password') {
-        throw new Error(data.error); // On propage juste le type d'erreur
-      } else {
-        throw new Error(data.message || 'Erreur de connexion');
-      }
+      // Gestion améliorée des erreurs
+      const errorType = data.error || 'unknown';
+      const errorMessage = data.message || 'Erreur de connexion';
+      throw new Error(`${errorType}|${errorMessage}`);
     }
 
     if (data.token && data.user) {
@@ -106,12 +104,10 @@ const login = async (email: string, password: string) => {
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
       setIsAuthenticated(true);
-    } else {
-      throw new Error('Données de connexion incomplètes');
     }
   } catch (error) {
     console.error('Login error:', error);
-    throw error; // Important: propager l'erreur pour la gérer dans Login.tsx
+    throw error;
   }
 };
 

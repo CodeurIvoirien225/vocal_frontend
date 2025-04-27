@@ -21,12 +21,17 @@ export default function Login() {
       await login(email, password);
       navigate('/feed');
     } catch (err: any) {
-      if (err.message === 'email') {
-        setEmailError('Email incorrect ou inexistant');
-      } else if (err.message === 'password') {
-        setPasswordError('Mot de passe incorrect');
-      } else {
-        setEmailError(err.message || 'Une erreur est survenue lors de la connexion');
+      const [errorType, errorMessage] = err.message.split('|');
+      
+      switch(errorType) {
+        case 'email':
+          setEmailError(errorMessage);
+          break;
+        case 'password':
+          setPasswordError(errorMessage);
+          break;
+        default:
+          setEmailError(errorMessage || 'Erreur inconnue');
       }
     }
   };
