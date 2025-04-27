@@ -20,12 +20,24 @@ export default function Login() {
       await login(email, password);
       navigate('/feed');
     } catch (err: any) {
-      if (err.message === 'email') {
+      console.error('Login error details:', err); // Pour le débogage
+      
+      // Gestion des erreurs plus détaillée
+      if (err.message.includes('Failed to fetch') || err.message.includes('404')) {
+        setEmailError('Le service est temporairement indisponible');
+      } 
+      else if (err.message.includes('401') || err.message.includes('Invalid credentials')) {
+        setEmailError('Email ou mot de passe incorrect');
+        setPasswordError('Email ou mot de passe incorrect');
+      }
+      else if (err.message === 'email') {
         setEmailError('Email incorrect ou inexistant');
-      } else if (err.message === 'password') {
+      } 
+      else if (err.message === 'password') {
         setPasswordError('Mot de passe incorrect');
-      } else {
-        setEmailError(err.message || 'Une erreur est survenue lors de la connexion');
+      } 
+      else {
+        setEmailError(err.response?.data?.message || err.message || 'Une erreur inattendue est survenue');
       }
     }
   };
