@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
   
       try {
-        const response = await fetch('https://p6-groupeb.com/abass/backend/api/verify-token.php', {
+        const response = await fetch('http://localhost/vocal/api/verify-token.php', {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 // Fonction de connexion modifiée
 const login = async (email: string, password: string) => {
   try {
-    const response = await fetch('https://p6-groupeb.com/abass/backend/api/login.php', {
+    const response = await fetch('http://localhost/vocal/api/login.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -122,7 +122,7 @@ const login = async (email: string, password: string) => {
   // Fonction d'inscription
   const register = async (username: string, email: string, password: string) => {
     try {
-      const response = await fetch('https://p6-groupeb.com/abass/backend/api/register.php', {
+      const response = await fetch('http://localhost/vocal/api/register.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })
