@@ -90,8 +90,9 @@ const login = async (email: string, password: string) => {
       body: JSON.stringify({ email, password })
     });
 
-    const data = await response.json();
-    
+    const responseText = await response.text();
+    const data = responseText ? JSON.parse(responseText) : {};
+
     if (!response.ok) {
       // Si le backend retourne une erreur spécifique
       if (data.error === 'email') {

@@ -20,9 +20,8 @@ export default function Login() {
       await login(email, password);
       navigate('/feed');
     } catch (err: any) {
-      console.error('Login error:', err);
+      console.error('Login error details:', err);
       
-      // Gestion spécifique des erreurs
       if (err.message === 'email') {
         setEmailError('Email incorrect ou inexistant');
       } else if (err.message === 'password') {
@@ -30,7 +29,7 @@ export default function Login() {
       } else if (err.message.includes('Failed to fetch')) {
         setEmailError('Problème de connexion au serveur');
       } else {
-        setEmailError('Une erreur est survenue lors de la connexion');
+        setEmailError(err.message || 'Une erreur est survenue lors de la connexion');
       }
     }
   };
