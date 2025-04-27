@@ -1,11 +1,5 @@
 {
-  "headers": {
-    "/*": {
-      "Content-Security-Policy": "default-src 'self'",
-      "X-Frame-Options": "DENY"
+    "routes": {
+      "/*": "/index.html"
     }
-  },
-  "routes": {
-    "/*": "/index.html 200"
   }
-}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom'; // Changé BrowserRouter → HashRouter
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Feed from './pages/Feed';
@@ -7,12 +7,12 @@ import Notifications from './pages/Notifications';
 import { AuthProvider } from './contexts/AuthContext';
 import Dashboard from './components/Dashboard';
 import ForgotPassword from './components/ForgotPassword';
-import Home from './pages/Home';
+import Home from './pages/Home'; 
 
 function App() {
   return (
     <AuthProvider>
-      <Router basename="/"> {/* Ajout du basename */}
+      <Router>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
