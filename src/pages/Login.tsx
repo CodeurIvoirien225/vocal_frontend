@@ -20,26 +20,12 @@ export default function Login() {
       await login(email, password);
       navigate('/feed');
     } catch (err: any) {
-      console.error('Login error details:', err);
-      
       if (err.message === 'email') {
         setEmailError('Email incorrect ou inexistant');
-        setPasswordError(''); // Effacer l'erreur mot de passe
-      } 
-      else if (err.message === 'password') {
+      } else if (err.message === 'password') {
         setPasswordError('Mot de passe incorrect');
-        setEmailError(''); // Effacer l'erreur email
-      }
-      else if (err.message === 'invalid_credentials') {
-        // Cas de fallback si le backend change son comportement
-        setEmailError('Email ou mot de passe incorrect');
-        setPasswordError('Email ou mot de passe incorrect');
-      }
-      else if (err.message.includes('Failed to fetch')) {
-        setEmailError('Problème de connexion au serveur');
-      }
-      else {
-        setEmailError('Une erreur est survenue lors de la connexion');
+      } else {
+        setEmailError(err.message || 'Une erreur est survenue lors de la connexion');
       }
     }
   };

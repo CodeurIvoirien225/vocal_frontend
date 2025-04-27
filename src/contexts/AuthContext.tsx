@@ -90,37 +90,30 @@ const login = async (email: string, password: string) => {
       body: JSON.stringify({ email, password })
     });
 
-    // D'abord lire le texte de la réponse
-    const responseText = await response.text();
-    let data;
+    const data = await response.json();
     
-    try {
-      data = responseText ? JSON.parse(responseText) : {};
-    } catch (e) {
-      console.error('Failed to parse response:', responseText);
-      throw new Error('Invalid server response');
-    }
-
     if (!response.ok) {
-      // Maintenant on vérifie la structure exacte de l'erreur
+      // Si le backend retourne une erreur spécifique (email ou password)
       if (data.error === 'email') {
-        throw new Error('email');
+        throw new Error('email'); // Erreur spécifique pour l'email
       } else if (data.error === 'password') {
-        throw new Error('password');
+        throw new Error('password'); // Erreur spécifique pour le mot de passe
       } else {
-        // Fallback pour les autres erreurs 401
-        throw new Error(data.error || 'invalid_credentials');
+        throw new Error(data.error || 'Erreur de connexion');
       }
     }
 
     if (data.token && data.user) {
-      // Traitement de la connexion réussie...
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      setUser(data.user);
+      setIsAuthenticated(true);
     } else {
       throw new Error('Données de connexion incomplètes');
     }
   } catch (error) {
-    console.error('Login API error:', error);
-    throw error;
+    console.error('Login error:', error);
+    throw error; // Important: propager l'erreur pour la gérer dans Login.tsx
   }
 };
 
