@@ -90,31 +90,32 @@ const login = async (email: string, password: string) => {
       body: JSON.stringify({ email, password })
     });
 
+    // Première lecture du texte de la réponse
     const responseText = await response.text();
-    const data = responseText ? JSON.parse(responseText) : {};
+    let data;
+    
+    try {
+      data = responseText ? JSON.parse(responseText) : {};
+    } catch (e) {
+      console.error('Failed to parse response:', responseText);
+      throw new Error('Invalid server response');
+    }
 
     if (!response.ok) {
-      // Si le backend retourne une erreur spécifique
+      // Gestion spécifique des erreurs du backend
       if (data.error === 'email') {
-        throw new Error('email'); // Propage l'erreur spécifique
+        throw new Error('email'); // Spécifique à l'email
       } else if (data.error === 'password') {
-        throw new Error('password'); // Propage l'erreur spécifique
+        throw new Error('password'); // Spécifique au mot de passe
       } else {
         throw new Error(data.message || 'Erreur de connexion');
       }
     }
 
-    if (data.token && data.user) {
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      setUser(data.user);
-      setIsAuthenticated(true);
-    } else {
-      throw new Error('Données de connexion incomplètes');
-    }
+    // Suite du traitement en cas de succès...
   } catch (error) {
-    console.error('Login error:', error);
-    throw error; // Propage l'erreur pour la gérer dans le composant
+    console.error('Login API error:', error);
+    throw error; // Important: propager l'erreur
   }
 };
 
