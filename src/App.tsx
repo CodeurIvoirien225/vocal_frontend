@@ -7,12 +7,11 @@ import Notifications from './pages/Notifications';
 import { AuthProvider } from './contexts/AuthContext';
 import Dashboard from './components/Dashboard';
 import ForgotPassword from './components/ForgotPassword';
-import Home from './pages/Home'; 
+import Home from './pages/Home';
 
 function App() {
   return (
     <AuthProvider>
-      <Router basename="/"></Router>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -22,6 +21,8 @@ function App() {
           <Route path="/feed" element={<Feed />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          {/* Ajoutez cette route de fallback */}
+          <Route path="*" element={<Home />} />
         </Routes>
       </Router>
     </AuthProvider>

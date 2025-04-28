@@ -1,5 +1,16 @@
 {
     "routes": {
-      "/*": "/index.html"
+      "/*": "/index.html",
+      "/login": "/index.html",
+      "/register": "/index.html",
+      "/feed": "/index.html",
+      "/notifications": "/index.html",
+      "/dashboard": "/index.html",
+      "/forgot-password": "/index.html"
+    },
+    "headers": {
+      "/*": {
+        "Cache-Control": "no-cache"
+      }
     }
   }
