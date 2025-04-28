@@ -11,7 +11,6 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setEmailError('');
@@ -21,17 +20,12 @@ export default function Login() {
       await login(email, password);
       navigate('/feed');
     } catch (err: any) {
-      const [errorType, errorMessage] = err.message.split('|');
-      
-      switch(errorType) {
-        case 'email':
-          setEmailError(errorMessage);
-          break;
-        case 'password':
-          setPasswordError(errorMessage);
-          break;
-        default:
-          setEmailError(errorMessage || 'Erreur inconnue');
+      if (err.message === 'email') {
+        setEmailError('Email incorrect ou inexistant');
+      } else if (err.message === 'password') {
+        setPasswordError('Mot de passe incorrect');
+      } else {
+        setEmailError(err.message || 'Une erreur est survenue lors de la connexion');
       }
     }
   };

@@ -1,16 +1,14 @@
 {
+    "root": "dist",
     "routes": {
-      "/*": "/index.html",
-      "/login": "/index.html",
-      "/register": "/index.html",
-      "/feed": "/index.html",
-      "/notifications": "/index.html",
-      "/dashboard": "/index.html",
-      "/forgot-password": "/index.html"
+      "/**": "/index.html"
     },
+    "clean_urls": false,
     "headers": {
       "/*": {
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
       }
     }
   }
