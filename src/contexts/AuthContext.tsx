@@ -9,10 +9,15 @@ export interface User {
   // Ajoutez d'autres champs si nécessaire
 }
 
+interface AuthError {
+  type: 'email' | 'password' | 'unknown';
+  message: string;
+}
+
 // Interface pour le contexte d'authentification
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void | AuthError>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUser: (userData: User) => void;
@@ -93,10 +98,11 @@ const login = async (email: string, password: string) => {
     const data = await response.json();
     
     if (!response.ok) {
-      // Gestion améliorée des erreurs
-      const errorType = data.error || 'unknown';
-      const errorMessage = data.message || 'Erreur de connexion';
-      throw new Error(`${errorType}|${errorMessage}`);
+      // Renvoyer un objet d'erreur structuré au lieu d'une string
+      throw { 
+        type: data.error || 'unknown',
+        message: data.message || 'Erreur de connexion' 
+      };
     }
 
     if (data.token && data.user) {
@@ -107,10 +113,9 @@ const login = async (email: string, password: string) => {
     }
   } catch (error) {
     console.error('Login error:', error);
-    throw error;
+    throw error; // Transmettre l'erreur telle quelle
   }
 };
-
 
   // Fonction d'inscription
   const register = async (username: string, email: string, password: string) => {

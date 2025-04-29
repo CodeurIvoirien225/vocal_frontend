@@ -75,27 +75,41 @@ export default function ShareButton({ messageId, audioUrl, username, messageUser
     };
 
     const shareOnWhatsApp = () => {
-        const text = `Écoute ce message vocal de @${username}: ${audioUrl}`;
-        const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-        window.open(url, '_blank');
+        // Construire l'URL complète
+        const fullAudioUrl = `https://p6-groupeb.com/abass/backend/${audioUrl}`;
+        
+        // Message avec lien cliquable
+        const text = `🎤 Message vocal de @${username}:\n${fullAudioUrl}\n\nÉcoutez et répondez sur l'application !`;
+        
+        // Encodage URL
+        const encodedText = encodeURIComponent(text);
+        const whatsappUrl = `https://wa.me/?text=${encodedText}`;
+        
+        window.open(whatsappUrl, '_blank');
         trackShare('whatsapp');
     };
+    
 
     const shareOnFacebook = () => {
-        const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(audioUrl)}`;
-        window.open(url, '_blank');
+        const fullAudioUrl = `https://p6-groupeb.com/abass/backend/${audioUrl}`;
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(fullAudioUrl)}`;
+        window.open(facebookUrl, '_blank');
         trackShare('facebook');
     };
-
+    
     const shareOnTwitter = () => {
-        const text = `Écoute ce message vocal de @${username}`;
-        const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(audioUrl)}`;
-        window.open(url, '_blank');
+        const fullAudioUrl = `https://p6-groupeb.com/abass/backend/${audioUrl}`;
+        const text = `🎤 Écoutez ce message vocal de @${username}`;
+        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullAudioUrl)}`;
+        window.open(twitterUrl, '_blank');
         trackShare('twitter');
     };
 
     const copyLink = () => {
-        navigator.clipboard.writeText(audioUrl);
+        const fullAudioUrl = `https://p6-groupeb.com/abass/backend/${audioUrl}`;
+        navigator.clipboard.writeText(fullAudioUrl).then(() => {
+            alert('Lien copié dans le presse-papiers !');
+        });
         trackShare('link');
     };
 
