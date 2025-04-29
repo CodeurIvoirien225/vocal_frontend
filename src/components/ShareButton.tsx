@@ -79,7 +79,7 @@ export default function ShareButton({ messageId, audioUrl, username, messageUser
         const fullAudioUrl = `https://p6-groupeb.com/abass/backend/${audioUrl}`;
         
         // Message avec lien cliquable
-        const text = `🎤 Message vocal de @${username}:\n${fullAudioUrl}\n\nÉcoutez et répondez sur l'application !`;
+        const text = `${username} vous a envoyé un message vocal ! \n${fullAudioUrl}\n\n Ecouter et faite aussi une publication audio en vous inscrivant via ce lien : https://vocal-frontend.onrender.com`;
         
         // Encodage URL
         const encodedText = encodeURIComponent(text);
@@ -99,7 +99,7 @@ export default function ShareButton({ messageId, audioUrl, username, messageUser
     
     const shareOnTwitter = () => {
         const fullAudioUrl = `https://p6-groupeb.com/abass/backend/${audioUrl}`;
-        const text = `🎤 Écoutez ce message vocal de @${username}`;
+        const text = `${username}  vous a envoyé un message vocal ! Ecouter et faite aussi une publication audio en vous inscrivant via ce lien  : https://vocal-frontend.onrender.com`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(fullAudioUrl)}`;
         window.open(twitterUrl, '_blank');
         trackShare('twitter');
@@ -107,9 +107,7 @@ export default function ShareButton({ messageId, audioUrl, username, messageUser
 
     const copyLink = () => {
         const fullAudioUrl = `https://p6-groupeb.com/abass/backend/${audioUrl}`;
-        navigator.clipboard.writeText(fullAudioUrl).then(() => {
-            alert('Lien copié dans le presse-papiers !');
-        });
+        navigator.clipboard.writeText(fullAudioUrl);
         trackShare('link');
     };
 
