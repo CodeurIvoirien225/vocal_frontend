@@ -125,23 +125,26 @@ const login = async (email: string, password: string) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password })
       });
-
+  
       const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error(data.error || 'Erreur d\'inscription');
+        // Renvoyer un objet d'erreur structuré
+        throw { 
+          type: data.error || 'unknown',
+          message: data.message || 'Erreur d\'inscription' 
+        };
       }
-
+  
       if (data.token && data.user) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
         setIsAuthenticated(true);
-      } else {
-        throw new Error('Données d\'inscription incomplètes');
       }
     } catch (error) {
       console.error('Registration error:', error);
-      throw error;
+      throw error; // Transmettre l'erreur telle quelle
     }
   };
 
