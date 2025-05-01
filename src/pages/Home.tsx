@@ -85,6 +85,104 @@ const Home: React.FC = () => {
           </div>
         </section>
 
+        {/* Technologies Used - Enhanced Version */}
+<section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-xl p-8 mb-16 border border-white border-opacity-30">
+  <h2 className="text-3xl font-bold text-center text-gray-800 mb-8 relative">
+    <span className="relative z-10">
+      Technologies utilisées
+      <span className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-indigo-500 rounded-full"></span>
+    </span>
+  </h2>
+  
+  <div className="grid md:grid-cols-2 gap-12">
+    {/* Frontend Column */}
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-indigo-100 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-semibold text-gray-800">Frontend</h3>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        {/* React Card */}
+        <div className="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col items-center text-center">
+          <div className="mb-3 p-3 bg-blue-50 rounded-full">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" 
+              alt="React" 
+              className="w-10 h-10"
+            />
+          </div>
+          <span className="font-semibold text-gray-700">React.js</span>
+          <span className="text-xs text-indigo-500 mt-1">Bibliothèque JavaScript</span>
+        </div>
+        
+        {/* Tailwind Card */}
+        <div className="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col items-center text-center">
+          <div className="mb-3 p-3 bg-blue-50 rounded-full">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Tailwind_CSS_Logo.svg" 
+              alt="Tailwind CSS" 
+              className="w-10 h-10"
+            />
+          </div>
+          <span className="font-semibold text-gray-700">Tailwind CSS</span>
+          <span className="text-xs text-indigo-500 mt-1">Framework CSS</span>
+        </div>
+      </div>
+    </div>
+    
+    {/* Backend Column */}
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-purple-100 rounded-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-semibold text-gray-800">Backend</h3>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        {/* PHP Card */}
+        <div className="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col items-center text-center">
+          <div className="mb-3 p-3 bg-purple-50 rounded-full">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/2/27/PHP-logo.svg" 
+              alt="PHP" 
+              className="w-10 h-10"
+            />
+          </div>
+          <span className="font-semibold text-gray-700">PHP</span>
+          <span className="text-xs text-purple-500 mt-1">Langage serveur</span>
+        </div>
+        
+        {/* MySQL Card */}
+        <div className="bg-white p-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border border-gray-100 flex flex-col items-center text-center">
+          <div className="mb-3 p-3 bg-blue-50 rounded-full">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/b/b2/Database-mysql.svg" 
+              alt="MySQL" 
+              className="w-10 h-10"
+            />
+          </div>
+          <span className="font-semibold text-gray-700">MySQL</span>
+          <span className="text-xs text-blue-500 mt-1">Base de données</span>
+        </div>
+        
+        
+      </div>
+    </div>
+  </div>
+  
+  {/* Decorative Elements */}
+  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100 rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
+  <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-100 rounded-full mix-blend-multiply filter blur-xl opacity-20"></div>
+</section>
+
         {/* Call to Action */}
         <section className="text-center">
           <h3 className="text-2xl font-semibold text-gray-700 mb-6">
