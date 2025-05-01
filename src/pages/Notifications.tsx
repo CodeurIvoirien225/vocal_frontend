@@ -220,7 +220,7 @@ export default function Notifications() {
                 Supprimer les lues
               </button>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/feed')}
                 className="text-gray-600 hover:text-gray-800"
               >
                 <Home className="h-6 w-6" />
