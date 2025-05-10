@@ -78,12 +78,8 @@ export default function VocalMessage({
             reason: reportReason,
             category: reportCategory
           });
-
-
-          const apiUrl = 'https://p6-groupeb.com/abass/backend/admin/reports.php';
-console.log("[DEBUG] URL appelée:", apiUrl);
       
-          const response = await fetch( apiUrl , {
+          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -96,7 +92,6 @@ console.log("[DEBUG] URL appelée:", apiUrl);
             })
           });
       
-          
           // 4. Traitement de la réponse
           const responseData = await response.json();
           console.log("[DEBUG] Réponse du serveur:", responseData);
