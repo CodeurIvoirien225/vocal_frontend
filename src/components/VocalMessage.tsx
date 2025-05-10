@@ -80,7 +80,7 @@ export default function VocalMessage({
           });
 
 
-          const apiUrl = 'https://p6-groupeb.com/abass/backend/api/reports.php';
+          const apiUrl = 'https://p6-groupeb.com/abass/backend/api/submit_reports.php';
 console.log("[DEBUG] URL appelée:", apiUrl);
       
           const response = await fetch( apiUrl , {
