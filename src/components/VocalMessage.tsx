@@ -48,16 +48,7 @@ export default function VocalMessage({
       const handleSubmitReport = async () => {
         try {
           const token = localStorage.getItem('token');
-          
-          if (!token) {
-            setToast({
-              show: true,
-              message: 'Veuillez vous reconnecter (token manquant)',
-              type: 'error'
-            });
-            setTimeout(() => setToast(null), 3000);
-            return;
-          }
+          if (!token) throw new Error('Veuillez vous reconnecter');
       
           const response = await fetch('https://p6-groupeb.com/abass/backend/api/reports.php', {
             method: 'POST',
@@ -68,38 +59,39 @@ export default function VocalMessage({
             body: JSON.stringify({
               message_id: message.id,
               reason: reportReason,
-              category: reportCategory
+              category: reportCategory,
+              status: 'pending' // Ajout explicite du statut
             })
           });
       
+          const data = await response.json();
+          
           if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Erreur serveur");
+            throw new Error(data.error || "Échec du signalement");
           }
       
-          setToast({
-            show: true,
-            message: 'Signalement envoyé avec succès !',
-            type: 'success'
-          });
-          setTimeout(() => setToast(null), 3000);
-          
+          // Vérification côté frontend
+          console.log("Signalement créé:", data);
+          if (!data.report_id) {
+            throw new Error("Le serveur n'a pas retourné d'ID de signalement");
+          }
+      
+          setToast({ show: true, message: 'Signalement envoyé !', type: 'success' });
           setIsReporting(false);
-          setReportReason('');
-          setReportCategory('inappropriate');
-          
+      
         } catch (error) {
-          console.error("Erreur complète:", error);
-          
+          console.error("Erreur détaillée:", error);
           setToast({
             show: true,
-            message: error.message || "Erreur lors du signalement",
+            message: error.message.includes('token') 
+              ? 'Session expirée, veuillez vous reconnecter'
+              : error.message || "Erreur technique",
             type: 'error'
           });
+        } finally {
           setTimeout(() => setToast(null), 3000);
         }
-    };
-
+      };
       
     // Gestion du clic à l'extérieur de la modale
     useEffect(() => {
