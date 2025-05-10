@@ -47,11 +47,23 @@ export default function VocalMessage({
 
       const handleSubmitReport = async () => {
         try {
+          const token = localStorage.getItem('token');
+          
+          if (!token) {
+            setToast({
+              show: true,
+              message: 'Veuillez vous reconnecter (token manquant)',
+              type: 'error'
+            });
+            setTimeout(() => setToast(null), 3000);
+            return;
+          }
+      
           const response = await fetch('https://p6-groupeb.com/abass/backend/api/reports.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
               message_id: message.id,
@@ -60,31 +72,34 @@ export default function VocalMessage({
             })
           });
       
-          const data = await response.json();
-          
-          if (!response.ok || !data.report_id) { // Vérification renforcée
-            throw new Error(data.error || "Le serveur n'a pas retourné d'ID");
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Erreur serveur");
           }
       
           setToast({
             show: true,
-            message: `Signalement #${data.report_id} enregistré`,
+            message: 'Signalement envoyé avec succès !',
             type: 'success'
           });
-      
+          setTimeout(() => setToast(null), 3000);
+          
+          setIsReporting(false);
+          setReportReason('');
+          setReportCategory('inappropriate');
+          
         } catch (error) {
+          console.error("Erreur complète:", error);
+          
           setToast({
             show: true,
-            message: error.message.includes('token')
-              ? 'Veuillez vous reconnecter'
-              : error.message || 'Erreur inconnue',
+            message: error.message || "Erreur lors du signalement",
             type: 'error'
           });
-        } finally {
-          setIsReporting(false);
           setTimeout(() => setToast(null), 3000);
         }
-      };
+    };
+
       
     // Gestion du clic à l'extérieur de la modale
     useEffect(() => {
