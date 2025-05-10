@@ -47,83 +47,82 @@ export default function VocalMessage({
 
       const handleSubmitReport = async () => {
         try {
-            const token = localStorage.getItem('token');
-            
-            if (!token) {
-                setToast({
-                    show: true,
-                    message: 'Veuillez vous reconnecter (token manquant)',
-                    type: 'error'
-                });
-                setTimeout(() => setToast(null), 3000);
-                return;
-            }
-    
-            // Validation des champs
-            if (!reportReason || !reportCategory) {
-                setToast({
-                    show: true,
-                    message: 'Veuillez remplir tous les champs du signalement',
-                    type: 'error'
-                });
-                setTimeout(() => setToast(null), 3000);
-                return;
-            }
-    
-            const response = await fetch('https://p6-groupeb.com/abass/backend/api/reports.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    message_id: message.id,  // ID du message signalé
-                    reason: reportReason,     // Raison du signalement
-                    category: reportCategory  // Catégorie du signalement
-                })
-            });
-    
-            const responseData = await response.json(); // Toujours parser la réponse JSON
-    
-            if (!response.ok || !responseData.success) {
-                throw new Error(responseData.error || "Erreur lors de l'envoi du signalement");
-            }
-    
-            // Debug
-            console.log("Signalement créé:", {
-                id: responseData.report_id,
-                content_id: responseData.content_id,
-                status: responseData.status
-            });
-    
+          console.log("[DEBUG] Lancement du signalement...");
+      
+          // 1. Vérification du token
+          const token = localStorage.getItem('token');
+          if (!token) {
             setToast({
-                show: true,
-                message: 'Signalement envoyé avec succès !',
-                type: 'success'
+              show: true,
+              message: 'Veuillez vous reconnecter (token manquant)',
+              type: 'error'
             });
             setTimeout(() => setToast(null), 3000);
-            
-            // Réinitialisation du formulaire
-            setIsReporting(false);
-            setReportReason('');
-            setReportCategory('inappropriate');
-            
+            return;
+          }
+      
+          // 2. Validation des données
+          if (!message?.id || !reportReason || !reportCategory) {
+            setToast({
+              show: true,
+              message: 'Données incomplètes',
+              type: 'error'
+            });
+            setTimeout(() => setToast(null), 3000);
+            return;
+          }
+      
+          // 3. Envoi au serveur
+          console.log("[DEBUG] Données envoyées:", {
+            message_id: message.id,
+            reason: reportReason,
+            category: reportCategory
+          });
+      
+          const response = await fetch('https://p6-groupeb.com/abass/backend/api/reports.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              message_id: message.id,
+              reason: reportReason,
+              category: reportCategory
+            })
+          });
+      
+          // 4. Traitement de la réponse
+          const responseData = await response.json();
+          console.log("[DEBUG] Réponse du serveur:", responseData);
+      
+          if (!response.ok) {
+            throw new Error(responseData.error || "Erreur serveur");
+          }
+      
+          // 5. Succès
+          setToast({
+            show: true,
+            message: 'Signalement envoyé avec succès !',
+            type: 'success'
+          });
+          setTimeout(() => setToast(null), 3000);
+      
+          // Réinitialisation
+          setIsReporting(false);
+          setReportReason('');
+          setReportCategory('inappropriate');
+      
         } catch (error) {
-            console.error("Erreur détaillée:", {
-                message: error.message,
-                stack: error.stack
-            });
-            
-            setToast({
-                show: true,
-                message: error.message.includes("Token invalide") 
-                       ? "Session expirée, veuillez vous reconnecter"
-                       : error.message || "Erreur lors du signalement",
-                type: 'error'
-            });
-            setTimeout(() => setToast(null), 3000);
+          console.error("[ERREUR] Échec du signalement:", error);
+          setToast({
+            show: true,
+            message: error.message || "Erreur lors du signalement",
+            type: 'error'
+          });
+          setTimeout(() => setToast(null), 3000);
         }
-    };
+      };
 
       
     // Gestion du clic à l'extérieur de la modale
