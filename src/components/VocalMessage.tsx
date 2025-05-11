@@ -47,83 +47,62 @@ export default function VocalMessage({
 
       const handleSubmitReport = async () => {
         try {
-            console.log("[DEBUG] Lancement du signalement...");
-    
-            // 1. Vérification du token
-            const token = localStorage.getItem('token');
-            if (!token) {
-                setToast({
-                    show: true,
-                    message: 'Veuillez vous reconnecter (token manquant)',
-                    type: 'error'
-                });
-                setTimeout(() => setToast(null), 3000);
-                return;
-            }
-    
-            // 2. Validation des données
-            if (!message?.id || !reportReason || !reportCategory) {
-                setToast({
-                    show: true,
-                    message: 'Données incomplètes',
-                    type: 'error'
-                });
-                setTimeout(() => setToast(null), 3000);
-                return;
-            }
-    
-            // 3. Envoi au serveur
-            console.log("[DEBUG] Données envoyées:", {
-                message_id: message.id,
-                reason: reportReason,
-                category: reportCategory
-            });
-    
-            // ⚠️ Modification importante ici : suppression du ?admin dans l'URL POST
-            const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    message_id: message.id,
-                    reason: reportReason,
-                    category: reportCategory
-                })
-            });
-    
-            // 4. Traitement de la réponse
-            const responseData = await response.json();
-            console.log("[DEBUG] Réponse du serveur:", responseData);
-    
-            if (!response.ok) {
-                throw new Error(responseData.error || "Erreur serveur");
-            }
-    
-            // 5. Succès
-            setToast({
-                show: true,
-                message: 'Signalement envoyé avec succès !',
-                type: 'success'
-            });
-            setTimeout(() => setToast(null), 3000);
-    
-            // Réinitialisation
-            setIsReporting(false);
-            setReportReason('');
-            setReportCategory('inappropriate');
-    
+          // 1. Récupérer le token
+          const token = localStorage.getItem('token');
+          if (!token) {
+            alert('Veuillez vous reconnecter');
+            return;
+          }
+      
+          // 2. Valider les données
+          if (!message?.id || !reportReason || !reportCategory) {
+            alert('Veuillez compléter tous les champs');
+            return;
+          }
+      
+          // 3. Envoyer la requête POST (sans ?admin)
+          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              message_id: message.id,
+              reason: reportReason,
+              category: reportCategory
+            })
+          });
+      
+          // 4. Traiter la réponse
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Erreur serveur');
+          }
+      
+          alert('Signalement envoyé avec succès!');
+          setIsReporting(false);
+          
         } catch (error) {
-            console.error("[ERREUR] Échec du signalement:", error);
-            setToast({
-                show: true,
-                message: error.message || "Erreur lors du signalement",
-                type: 'error'
-            });
-            setTimeout(() => setToast(null), 3000);
+          console.error('Erreur:', error);
+          alert(error.message);
         }
-    };
+      };
+
+
+      const openAdminReports = () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          alert('Connectez-vous en tant qu\'admin');
+          return;
+        }
+        
+        // Ouvrir dans un nouvel onglet
+        window.open(
+          `https://p6-groupeb.com/abass/backend/api/submit_reports.php?admin&token=${token}`,
+          '_blank'
+        );
+      };
 
     const handleReaction = (type: 'laugh' | 'cry' | 'like') => {
         const updatedReactions = { ...localReactions };
