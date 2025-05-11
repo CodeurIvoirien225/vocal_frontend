@@ -47,156 +47,81 @@ export default function VocalMessage({
 
       const handleSubmitReport = async () => {
         try {
-          console.log("[DEBUG] Lancement du signalement...");
-      
-          // 1. Vérification du token
-          const token = localStorage.getItem('token');
-          if (!token) {
-            setToast({
-              show: true,
-              message: 'Veuillez vous reconnecter (token manquant)',
-              type: 'error'
-            });
-            setTimeout(() => setToast(null), 3000);
-            return;
-          }
-      
-          // 2. Validation des données
-          if (!message?.id || !reportReason || !reportCategory) {
-            setToast({
-              show: true,
-              message: 'Données incomplètes',
-              type: 'error'
-            });
-            setTimeout(() => setToast(null), 3000);
-            return;
-          }
-      
-          // 3. Envoi au serveur
-          console.log("[DEBUG] Données envoyées:", {
-            message_id: message.id,
-            reason: reportReason,
-            category: reportCategory
-          });
-      
-          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              message_id: message.id,
-              reason: reportReason,
-              category: reportCategory
-            })
-          });
-      
-          // 4. Traitement de la réponse
-          const responseData = await response.json();
-          console.log("[DEBUG] Réponse du serveur:", responseData);
-      
-          if (!response.ok) {
-            throw new Error(responseData.error || "Erreur serveur");
-          }
-      
-          // 5. Succès
-          setToast({
-            show: true,
-            message: 'Signalement envoyé avec succès !',
-            type: 'success'
-          });
-          setTimeout(() => setToast(null), 3000);
-      
-          // Réinitialisation
-          setIsReporting(false);
-          setReportReason('');
-          setReportCategory('inappropriate');
-      
-        } catch (error) {
-          console.error("[ERREUR] Échec du signalement:", error);
-          setToast({
-            show: true,
-            message: error.message || "Erreur lors du signalement",
-            type: 'error'
-          });
-          setTimeout(() => setToast(null), 3000);
-        }
-      };
-
-      
-    // Gestion du clic à l'extérieur de la modale
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-                setIsCommentsModalOpen(false);
+            console.log("[DEBUG] Lancement du signalement...");
+    
+            // 1. Vérification du token
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setToast({
+                    show: true,
+                    message: 'Veuillez vous reconnecter (token manquant)',
+                    type: 'error'
+                });
+                setTimeout(() => setToast(null), 3000);
+                return;
             }
-        }
-
-        if (isCommentsModalOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
-        }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isCommentsModalOpen]);
-
-    const handleAudioComment = async (blob: Blob) => {
-        setIsSending(true);
-        setError(null);
-
-        try {
-            const reader = new FileReader();
-            reader.onloadend = async () => {
-                const base64Audio = reader.result as string;
-
-                const newComment = {
-                    id: Date.now(),
-                    content: base64Audio,
-                    is_audio: true,
-                    created_at: new Date().toISOString(),
-                    username: user?.username || "Utilisateur"
-                };
-                setLocalComments([...localComments, newComment]);
-
-                await onComment(message.id, base64Audio, true);
-                setIsCommenting(false);
-            };
-            reader.readAsDataURL(blob);
-        } catch (err) {
-            setError("Erreur lors de l'envoi du commentaire audio");
-            console.error(err);
-        } finally {
-            setIsSending(false);
-        }
-    };
-
-    const handleTextComment = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!commentText.trim()) return;
-
-        setIsSending(true);
-        setError(null);
-
-        try {
-            const newComment = {
-                id: Date.now(),
-                content: commentText,
-                is_audio: false,
-                created_at: new Date().toISOString(),
-                username: user?.username || "Utilisateur"
-            };
-            setLocalComments([...localComments, newComment]);
-
-            await onComment(message.id, commentText, false);
-            setCommentText('');
-            setIsCommenting(false);
-        } catch (err) {
-            setError("Erreur lors de l'envoi du commentaire");
-            console.error(err);
-        } finally {
-            setIsSending(false);
+    
+            // 2. Validation des données
+            if (!message?.id || !reportReason || !reportCategory) {
+                setToast({
+                    show: true,
+                    message: 'Données incomplètes',
+                    type: 'error'
+                });
+                setTimeout(() => setToast(null), 3000);
+                return;
+            }
+    
+            // 3. Envoi au serveur
+            console.log("[DEBUG] Données envoyées:", {
+                message_id: message.id,
+                reason: reportReason,
+                category: reportCategory
+            });
+    
+            // ⚠️ Modification importante ici : suppression du ?admin dans l'URL POST
+            const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message_id: message.id,
+                    reason: reportReason,
+                    category: reportCategory
+                })
+            });
+    
+            // 4. Traitement de la réponse
+            const responseData = await response.json();
+            console.log("[DEBUG] Réponse du serveur:", responseData);
+    
+            if (!response.ok) {
+                throw new Error(responseData.error || "Erreur serveur");
+            }
+    
+            // 5. Succès
+            setToast({
+                show: true,
+                message: 'Signalement envoyé avec succès !',
+                type: 'success'
+            });
+            setTimeout(() => setToast(null), 3000);
+    
+            // Réinitialisation
+            setIsReporting(false);
+            setReportReason('');
+            setReportCategory('inappropriate');
+    
+        } catch (error) {
+            console.error("[ERREUR] Échec du signalement:", error);
+            setToast({
+                show: true,
+                message: error.message || "Erreur lors du signalement",
+                type: 'error'
+            });
+            setTimeout(() => setToast(null), 3000);
         }
     };
 
