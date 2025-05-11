@@ -14,6 +14,7 @@ export default function UserMessages() {
 
   useEffect(() => {
 
+
     const fetchUserMessages = async () => {
         try {
           const response = await fetch(`https://p6-groupeb.com/abass/backend/api/messages.php?user_id=${userId}`, {
@@ -23,19 +24,25 @@ export default function UserMessages() {
             }
           });
       
-          if (!response.ok) {
-            throw new Error(`Erreur HTTP: ${response.status}`);
+          const text = await response.text(); // D'abord lire comme texte
+          try {
+            const data = JSON.parse(text); // Ensuite essayer de parser comme JSON
+            
+            if (!response.ok) {
+              throw new Error(data.error || `Erreur HTTP: ${response.status}`);
+            }
+            
+            if (!data.success) {
+              throw new Error(data.error || 'Erreur inconnue du serveur');
+            }
+            
+            setMessages(data.messages || []);
+            setUsername(data.username || data.messages?.[0]?.username || 'Utilisateur');
+          } catch (jsonError) {
+            // Si le parsing JSON échoue, c'est probablement une erreur PHP
+            console.error('Réponse du serveur:', text);
+            throw new Error('Le serveur a renvoyé une réponse invalide');
           }
-      
-          const data = await response.json();
-          
-          if (!data.success) {
-            throw new Error(data.error || 'Erreur inconnue du serveur');
-          }
-      
-          setMessages(data.messages || []);
-          setUsername(data.username || data.messages?.[0]?.username || 'Utilisateur');
-      
         } catch (err) {
           console.error('Erreur:', err);
           setMessages([]);
