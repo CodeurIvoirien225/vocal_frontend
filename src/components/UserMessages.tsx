@@ -13,33 +13,33 @@ export default function UserMessages() {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
+
     const fetchUserMessages = async () => {
         try {
-          console.log(`Fetching messages for user ${userId}...`);
           const response = await fetch(`https://p6-groupeb.com/abass/backend/api/messages.php?user_id=${userId}`, {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'Authorization': `Bearer ${localStorage.getItem('token')}`,
+              'Content-Type': 'application/json'
             }
           });
-          
-          console.log('Response status:', response.status);
-          const data = await response.json();
-          console.log('API Response:', data);
-          
-          if (data.messages) {
-            console.log('Messages found:', data.messages.length);
-            setMessages(data.messages);
-            setUsername(data.messages[0]?.username || 'Utilisateur');
-            
-            // Debug: Vérifiez le premier message
-            if (data.messages.length > 0) {
-              console.log('First message audio URL:', data.messages[0].audio_url);
-            }
-          } else {
-            console.warn('No "messages" key in response');
+      
+          if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
           }
+      
+          const data = await response.json();
+          
+          if (!data.success) {
+            throw new Error(data.error || 'Erreur inconnue du serveur');
+          }
+      
+          setMessages(data.messages || []);
+          setUsername(data.username || data.messages?.[0]?.username || 'Utilisateur');
+      
         } catch (err) {
-          console.error('Fetch error:', err);
+          console.error('Erreur:', err);
+          setMessages([]);
+          setUsername('Utilisateur inconnu');
         } finally {
           setLoading(false);
         }
@@ -68,10 +68,11 @@ export default function UserMessages() {
         {loading ? (
           <div>Chargement...</div>
         ) : messages.length === 0 ? (
-          <div className="text-center py-12">
+
+            <div className="text-center py-12">
             <Mic className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-lg font-medium text-gray-900">
-              Aucun message trouvé
+              {username === 'Utilisateur inconnu' ? 'Utilisateur non trouvé' : 'Aucun message trouvé'}
             </h3>
           </div>
         ) : (
