@@ -47,21 +47,39 @@ export default function VocalMessage({
 
       const handleSubmitReport = async () => {
         try {
-          // 1. Récupérer le token
+          console.log("[DEBUG] Lancement du signalement...");
+      
+          // 1. Vérification du token
           const token = localStorage.getItem('token');
           if (!token) {
-            alert('Veuillez vous reconnecter');
+            setToast({
+              show: true,
+              message: 'Veuillez vous reconnecter (token manquant)',
+              type: 'error'
+            });
+            setTimeout(() => setToast(null), 3000);
             return;
           }
       
-          // 2. Valider les données
+          // 2. Validation des données
           if (!message?.id || !reportReason || !reportCategory) {
-            alert('Veuillez compléter tous les champs');
+            setToast({
+              show: true,
+              message: 'Données incomplètes',
+              type: 'error'
+            });
+            setTimeout(() => setToast(null), 3000);
             return;
           }
       
-          // 3. Envoyer la requête POST (sans ?admin)
-          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
+          // 3. Envoi au serveur
+          console.log("[DEBUG] Données envoyées:", {
+            message_id: message.id,
+            reason: reportReason,
+            category: reportCategory
+          });
+      
+          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php?admin', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -74,35 +92,113 @@ export default function VocalMessage({
             })
           });
       
-          // 4. Traiter la réponse
+          // 4. Traitement de la réponse
+          const responseData = await response.json();
+          console.log("[DEBUG] Réponse du serveur:", responseData);
+      
           if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Erreur serveur');
+            throw new Error(responseData.error || "Erreur serveur");
           }
       
-          alert('Signalement envoyé avec succès!');
+          // 5. Succès
+          setToast({
+            show: true,
+            message: 'Signalement envoyé avec succès !',
+            type: 'success'
+          });
+          setTimeout(() => setToast(null), 3000);
+      
+          // Réinitialisation
           setIsReporting(false);
-          
+          setReportReason('');
+          setReportCategory('inappropriate');
+      
         } catch (error) {
-          console.error('Erreur:', error);
-          alert(error.message);
+          console.error("[ERREUR] Échec du signalement:", error);
+          setToast({
+            show: true,
+            message: error.message || "Erreur lors du signalement",
+            type: 'error'
+          });
+          setTimeout(() => setToast(null), 3000);
         }
       };
 
-
-      const openAdminReports = () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('Connectez-vous en tant qu\'admin');
-          return;
+      
+    // Gestion du clic à l'extérieur de la modale
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+                setIsCommentsModalOpen(false);
+            }
         }
-        
-        // Ouvrir dans un nouvel onglet
-        window.open(
-          `https://p6-groupeb.com/abass/backend/api/submit_reports.php?admin&token=${token}`,
-          '_blank'
-        );
-      };
+
+        if (isCommentsModalOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isCommentsModalOpen]);
+
+    const handleAudioComment = async (blob: Blob) => {
+        setIsSending(true);
+        setError(null);
+
+        try {
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+                const base64Audio = reader.result as string;
+
+                const newComment = {
+                    id: Date.now(),
+                    content: base64Audio,
+                    is_audio: true,
+                    created_at: new Date().toISOString(),
+                    username: user?.username || "Utilisateur"
+                };
+                setLocalComments([...localComments, newComment]);
+
+                await onComment(message.id, base64Audio, true);
+                setIsCommenting(false);
+            };
+            reader.readAsDataURL(blob);
+        } catch (err) {
+            setError("Erreur lors de l'envoi du commentaire audio");
+            console.error(err);
+        } finally {
+            setIsSending(false);
+        }
+    };
+
+    const handleTextComment = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!commentText.trim()) return;
+
+        setIsSending(true);
+        setError(null);
+
+        try {
+            const newComment = {
+                id: Date.now(),
+                content: commentText,
+                is_audio: false,
+                created_at: new Date().toISOString(),
+                username: user?.username || "Utilisateur"
+            };
+            setLocalComments([...localComments, newComment]);
+
+            await onComment(message.id, commentText, false);
+            setCommentText('');
+            setIsCommenting(false);
+        } catch (err) {
+            setError("Erreur lors de l'envoi du commentaire");
+            console.error(err);
+        } finally {
+            setIsSending(false);
+        }
+    };
 
     const handleReaction = (type: 'laugh' | 'cry' | 'like') => {
         const updatedReactions = { ...localReactions };
