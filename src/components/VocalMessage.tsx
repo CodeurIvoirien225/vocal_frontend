@@ -47,10 +47,8 @@ export default function VocalMessage({
 
       const handleSubmitReport = async () => {
         try {
-          console.log("[DEBUG] Lancement du signalement...");
-      
-          // 1. Vérification du token
           const token = localStorage.getItem('token');
+          
           if (!token) {
             setToast({
               show: true,
@@ -60,24 +58,6 @@ export default function VocalMessage({
             setTimeout(() => setToast(null), 3000);
             return;
           }
-      
-          // 2. Validation des données
-          if (!message?.id || !reportReason || !reportCategory) {
-            setToast({
-              show: true,
-              message: 'Données incomplètes',
-              type: 'error'
-            });
-            setTimeout(() => setToast(null), 3000);
-            return;
-          }
-      
-          // 3. Envoi au serveur
-          console.log("[DEBUG] Données envoyées:", {
-            message_id: message.id,
-            reason: reportReason,
-            category: reportCategory
-          });
       
           const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
             method: 'POST',
@@ -91,6 +71,34 @@ export default function VocalMessage({
               category: reportCategory
             })
           });
+      
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Erreur serveur");
+          }
+      
+          setToast({
+            show: true,
+            message: 'Signalement envoyé avec succès !',
+            type: 'success'
+          });
+          setTimeout(() => setToast(null), 3000);
+          
+          setIsReporting(false);
+          setReportReason('');
+          setReportCategory('inappropriate');
+          
+        } catch (error) {
+          console.error("Erreur complète:", error);
+          
+          setToast({
+            show: true,
+            message: error.message || "Erreur lors du signalement",
+            type: 'error'
+          });
+          setTimeout(() => setToast(null), 3000);
+        }
+    };
       
           // 4. Traitement de la réponse
           const responseData = await response.json();
