@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Smile, ThumbsUp, Frown, AlertTriangle, MessageCircle, Mic, Share2 } from 'lucide-react';
@@ -23,6 +24,7 @@ export default function VocalMessage({
     onComment,
     onReport,
 }: VocalMessageProps) {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [isCommenting, setIsCommenting] = useState(false);
     const [commentText, setCommentText] = useState('');
@@ -204,10 +206,10 @@ export default function VocalMessage({
                     <span className="text-sm text-gray-600">
                         {format(new Date(message.created_at), 'PPp', { locale: fr })}
                     </span>
-                    <span 
-  className="text-sm font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors duration-200"
+<span 
+  className="text-sm font-medium text-indigo-600 cursor-pointer hover:underline"
   onClick={(e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Empêche la propagation de l'événement
     navigate(`/user/${message.user_id}`);
   }}
 >
