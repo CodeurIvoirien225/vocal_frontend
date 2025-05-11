@@ -50,10 +50,11 @@ export default function Feed() {
   const currentMessages = messages.slice(indexOfFirstMessage, indexOfLastMessage);
   const totalPages = Math.ceil(messages.length / messagesPerPage);
 
-  const handleAudioRecorded = async (blob: Blob) => {
+  const handleAudioRecorded = async (blob: Blob, title: string) => {
     const formData = new FormData();
     formData.append('audio', blob);
-
+    formData.append('title', title);
+  
     try {
       const response = await fetch('https://p6-groupeb.com/abass/backend/api/messages.php', {
         method: 'POST',
@@ -62,6 +63,8 @@ export default function Feed() {
         },
         body: formData
       });
+
+      
       const data = await response.json();
       if (data.success) {
         fetchMessages();

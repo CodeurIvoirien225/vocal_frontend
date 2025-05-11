@@ -227,22 +227,27 @@ export default function VocalMessage({
             </div>
 
             {/* Audio avec bouton de partage */}
-            <div className="flex items-start gap-4 mb-4">
-                <AudioPlayer
-                    src={message.audio_url}
-                    className="flex-1"
-                    audioProps={{
-                        controls: true,
-                        controlsList: "nodownload noplaybackrate"
-                    }}
-                />
-                <ShareButton 
-                    messageId={message.id}
-                    audioUrl={message.audio_url}
-                    username={displayUsername}
-                    messageUserId={message.user_id}
-                />
-            </div>
+            
+<div className="flex items-start gap-4 mb-4">
+  {/* Ajoutez cette section pour le titre */}
+  <div className="flex-1">
+    <h3 className="font-semibold text-lg mb-2">{message.title}</h3>
+    <AudioPlayer
+      src={message.audio_url}
+      className="w-full"
+      audioProps={{
+        controls: true,
+        controlsList: "nodownload noplaybackrate"
+      }}
+    />
+  </div>
+  <ShareButton 
+    messageId={message.id}
+    audioUrl={message.audio_url}
+    username={displayUsername}
+    messageUserId={message.user_id}
+  />
+</div>
 
             {/* Réactions */}
             <div className="flex items-center gap-4 mb-4">

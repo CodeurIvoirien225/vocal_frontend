@@ -9,6 +9,7 @@ export interface VocalMessage {
   id: number;
   user_id: number;
   audio_url: string;
+  title: string;
   created_at: string;
   reactions: {
     laugh: number;

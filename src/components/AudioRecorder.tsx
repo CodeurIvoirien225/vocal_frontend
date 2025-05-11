@@ -77,13 +77,24 @@ export default function AudioRecorder({ onAudioRecorded, className = '' }: Audio
   };
 
   const handleSend = () => {
-    if (audioBlob && title.trim()) { // Vérifie que le titre n'est pas vide
+    if (!title.trim()) {
+      alert('Veuillez ajouter un titre à votre enregistrement');
+      return;
+    }
+    
+    if (title.length > 255) {
+      alert('Le titre ne peut pas dépasser 255 caractères');
+      return;
+    }
+  
+    if (audioBlob) {
       onAudioRecorded(audioBlob, title.trim());
       setAudioBlob(null);
-      setTitle(''); // Réinitialise le titre après envoi
+      setTitle('');
     }
   };
 
+  
   const handleDelete = () => {
     setAudioBlob(null);
     setTitle(''); // Réinitialise le titre lors de la suppression
