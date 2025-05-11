@@ -14,24 +14,36 @@ export default function UserMessages() {
 
   useEffect(() => {
     const fetchUserMessages = async () => {
-      try {
-        const response = await fetch(`https://p6-groupeb.com/abass/backend/api/messages.php?user_id=${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        try {
+          console.log(`Fetching messages for user ${userId}...`);
+          const response = await fetch(`https://p6-groupeb.com/abass/backend/api/messages.php?user_id=${userId}`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          console.log('Response status:', response.status);
+          const data = await response.json();
+          console.log('API Response:', data);
+          
+          if (data.messages) {
+            console.log('Messages found:', data.messages.length);
+            setMessages(data.messages);
+            setUsername(data.messages[0]?.username || 'Utilisateur');
+            
+            // Debug: Vérifiez le premier message
+            if (data.messages.length > 0) {
+              console.log('First message audio URL:', data.messages[0].audio_url);
+            }
+          } else {
+            console.warn('No "messages" key in response');
           }
-        });
-        
-        const data = await response.json();
-        if (data.messages) {
-          setMessages(data.messages);
-          setUsername(data.messages[0]?.username || 'Utilisateur');
+        } catch (err) {
+          console.error('Fetch error:', err);
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error('Fetch error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
     fetchUserMessages();
   }, [userId]);
