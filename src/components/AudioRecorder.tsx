@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Mic, Square, Send, Trash } from 'lucide-react';
 
 interface AudioRecorderProps {
-  onAudioRecorded: (blob: Blob) => void;
+  onAudioRecorded: (blob: Blob, title: string) => void; // Modifié pour inclure le titre
   className?: string;
 }
 
@@ -10,6 +10,7 @@ export default function AudioRecorder({ onAudioRecorded, className = '' }: Audio
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [countdown, setCountdown] = useState(60);
+  const [title, setTitle] = useState(''); // Nouvel état pour le titre
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
@@ -76,14 +77,16 @@ export default function AudioRecorder({ onAudioRecorded, className = '' }: Audio
   };
 
   const handleSend = () => {
-    if (audioBlob) {
-      onAudioRecorded(audioBlob);
+    if (audioBlob && title.trim()) { // Vérifie que le titre n'est pas vide
+      onAudioRecorded(audioBlob, title.trim());
       setAudioBlob(null);
+      setTitle(''); // Réinitialise le titre après envoi
     }
   };
 
   const handleDelete = () => {
     setAudioBlob(null);
+    setTitle(''); // Réinitialise le titre lors de la suppression
   };
 
   useEffect(() => {
@@ -123,18 +126,28 @@ export default function AudioRecorder({ onAudioRecorded, className = '' }: Audio
             Enregistrement en cours...
           </span>
           <span className="text-lg font-bold text-black">
-  {countdown}s
-</span>
+            {countdown}s
+          </span>
         </div>
       )}
 
-      {/* Lecteur audio */}
+      {/* Lecteur audio et champ de titre */}
       {audioBlob && (
-        <audio
-          controls
-          src={URL.createObjectURL(audioBlob)}
-          className="h-10"
-        />
+        <div className="flex flex-col gap-4 w-full">
+          <audio
+            controls
+            src={URL.createObjectURL(audioBlob)}
+            className="h-10"
+          />
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Ajouter un titre à votre enregistrement"
+            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          />
+        </div>
       )}
 
       {/* Bouton Supprimer */}
@@ -151,7 +164,8 @@ export default function AudioRecorder({ onAudioRecorded, className = '' }: Audio
       {audioBlob && (
         <button
           onClick={handleSend}
-          className="p-2 rounded-full bg-green-600 text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          disabled={!title.trim()} // Désactive si le titre est vide
+          className={`p-2 rounded-full ${title.trim() ? 'bg-green-600 hover:bg-green-700' : 'bg-green-300 cursor-not-allowed'} text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
         >
           <Send className="h-6 w-6" />
         </button>
