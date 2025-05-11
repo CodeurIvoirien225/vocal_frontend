@@ -8,6 +8,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import Dashboard from './components/Dashboard';
 import ForgotPassword from './components/ForgotPassword';
 import Home from './pages/Home';
+import UserMessages from './components/UserMessages';
+
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/user/:userId" element={<UserMessages />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />

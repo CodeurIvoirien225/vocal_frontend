@@ -204,9 +204,15 @@ export default function VocalMessage({
                     <span className="text-sm text-gray-600">
                         {format(new Date(message.created_at), 'PPp', { locale: fr })}
                     </span>
-                    <span className="text-sm font-medium text-indigo-600">
-                        @{displayUsername}
-                    </span>
+                    <span 
+  className="text-sm font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors duration-200"
+  onClick={(e) => {
+    e.stopPropagation();
+    navigate(`/user/${message.user_id}`);
+  }}
+>
+  @{displayUsername}
+</span>
 
                     {toast && (
   <div className={`fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 ${
