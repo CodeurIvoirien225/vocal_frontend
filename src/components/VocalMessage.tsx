@@ -99,38 +99,6 @@ export default function VocalMessage({
           setTimeout(() => setToast(null), 3000);
         }
     };
-      
-          // 4. Traitement de la réponse
-          const responseData = await response.json();
-          console.log("[DEBUG] Réponse du serveur:", responseData);
-      
-          if (!response.ok) {
-            throw new Error(responseData.error || "Erreur serveur");
-          }
-      
-          // 5. Succès
-          setToast({
-            show: true,
-            message: 'Signalement envoyé avec succès !',
-            type: 'success'
-          });
-          setTimeout(() => setToast(null), 3000);
-      
-          // Réinitialisation
-          setIsReporting(false);
-          setReportReason('');
-          setReportCategory('inappropriate');
-      
-        } catch (error) {
-          console.error("[ERREUR] Échec du signalement:", error);
-          setToast({
-            show: true,
-            message: error.message || "Erreur lors du signalement",
-            type: 'error'
-          });
-          setTimeout(() => setToast(null), 3000);
-        }
-      };
 
       
     // Gestion du clic à l'extérieur de la modale
