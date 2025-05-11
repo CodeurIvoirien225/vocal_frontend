@@ -181,7 +181,7 @@ const updateUser = (userData: User) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {isAuthLoading ? <div>Chargement de l'authentification...</div> : children}
+      {isAuthLoading ? <div>Chargement...</div> : children}
     </AuthContext.Provider>
   );
 }
