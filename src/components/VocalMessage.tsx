@@ -79,7 +79,7 @@ export default function VocalMessage({
             category: reportCategory
           });
       
-          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php?admin', {
+          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
