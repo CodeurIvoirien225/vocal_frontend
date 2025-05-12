@@ -17,8 +17,6 @@ interface VocalMessageProps {
     onUserClick?: (userId: number) => void;
 }
 
-
-
 export default function VocalMessage({
     message,
     onReact,
@@ -30,77 +28,64 @@ export default function VocalMessage({
     const { user } = useAuth();
     const [isCommenting, setIsCommenting] = useState(false);
     const [commentText, setCommentText] = useState('');
-    const [localComments, setLocalComments] = useState(message.comments);
-    const [localReactions, setLocalReactions] = useState(message.reactions);
+    const [localComments, setLocalComments] = useState(message.comments || []);
+    const [localReactions, setLocalReactions] = useState(message.reactions || { laugh: 0, cry: 0, like: 0 });
     const [lastReaction, setLastReaction] = useState<string | null>(null);
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
     const modalRef = useRef<HTMLDivElement>(null);
-
     const [isReporting, setIsReporting] = useState(false);
     const [reportReason, setReportReason] = useState('');
     const [reportCategory, setReportCategory] = useState('inappropriate');
-
     const [toast, setToast] = useState<{
         show: boolean;
         message: string;
         type: 'success' | 'error';
-      } | null>(null);
+    } | null>(null);
 
-
-      const handleSubmitReport = async () => {
+    const handleSubmitReport = async () => {
         try {
-          const token = localStorage.getItem('token');
-          
-          if (!token) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setToast({
+                    show: true,
+                    message: 'Veuillez vous reconnecter',
+                    type: 'error'
+                });
+                setTimeout(() => setToast(null), 3000);
+                return;
+            }
+
+            const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message_id: message.id,
+                    reason: reportReason,
+                    category: reportCategory
+                })
+            });
+
+            if (!response.ok) throw new Error('Erreur serveur');
+
             setToast({
-              show: true,
-              message: 'Veuillez vous reconnecter (token manquant)',
-              type: 'error'
+                show: true,
+                message: 'Signalement envoyé!',
+                type: 'success'
             });
             setTimeout(() => setToast(null), 3000);
-            return;
-          }
-      
-          const response = await fetch('https://p6-groupeb.com/abass/backend/api/submit_reports.php', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              message_id: message.id,
-              reason: reportReason,
-              category: reportCategory
-            })
-          });
-      
-          if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Erreur serveur");
-          }
-      
-          setToast({
-            show: true,
-            message: 'Signalement envoyé avec succès !',
-            type: 'success'
-          });
-          setTimeout(() => setToast(null), 3000);
-          
-          setIsReporting(false);
-          setReportReason('');
-          setReportCategory('inappropriate');
-          
+            setIsReporting(false);
         } catch (error) {
-          console.error("Erreur complète:", error);
-          
-          setToast({
-            show: true,
-            message: error.message || "Erreur lors du signalement",
-            type: 'error'
-          });
-          setTimeout(() => setToast(null), 3000);
+            setToast({
+                show: true,
+                message: 'Erreur lors du signalement',
+                type: 'error'
+            });
+            setTimeout(() => setToast(null), 3000);
         }
     };
 
@@ -202,42 +187,25 @@ export default function VocalMessage({
 
     return (
         <div className="bg-white rounded-lg shadow p-4 mb-4">
-            {/* En-tête */}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-600">
                         {format(new Date(message.created_at), 'PPp', { locale: fr })}
                     </span>
                     <button
-  className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
-  onClick={(e) => {
-    e.stopPropagation(); // Empêche la propagation de l'événement
-    if (onUserClick) {
-      onUserClick(message.user_id);
-    } else {
-      navigate(`/user/${message.user_id}/messages`);
-    }
-  }}
->
-  @{displayUsername}
-</button>
-
-                    {toast && (
-  <div className={`fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 ${
-    toast.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-  }`}>
-    {toast.message}
-  </div>
-)}
-
+                        onClick={() => onUserClick ? onUserClick(message.user_id) : navigate(`/user/${message.user_id}/messages`)}
+                        className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
+                    >
+                        @{displayUsername}
+                    </button>
                 </div>
                 <button
-  onClick={() => setIsReporting(true)}
-  className="text-red-600 hover:text-red-700 text-sm flex items-center gap-1"
->
-  <AlertTriangle className="h-4 w-4" />
-  Signaler
-</button>
+                    onClick={() => setIsReporting(true)}
+                    className="text-red-600 hover:text-red-700 text-sm flex items-center gap-1"
+                >
+                    <AlertTriangle className="h-4 w-4" />
+                    Signaler
+                </button>
             </div>
 
             {/* Audio avec bouton de partage */}
