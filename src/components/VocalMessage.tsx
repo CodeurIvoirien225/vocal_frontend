@@ -14,6 +14,7 @@ interface VocalMessageProps {
     onReact: (messageId: number, type: 'laugh' | 'cry' | 'like') => void;
     onComment: (messageId: number, content: string, isAudio: boolean) => void;
     onReport: (messageId: number) => void;
+    onUserClick?: (userId: number) => void;
 }
 
 
@@ -23,6 +24,7 @@ export default function VocalMessage({
     onReact,
     onComment,
     onReport,
+    onUserClick,
 }: VocalMessageProps) {
     const navigate = useNavigate();
     const { user } = useAuth();
@@ -206,15 +208,19 @@ export default function VocalMessage({
                     <span className="text-sm text-gray-600">
                         {format(new Date(message.created_at), 'PPp', { locale: fr })}
                     </span>
-<span 
-  className="text-sm font-medium text-indigo-600 cursor-pointer hover:underline"
+                    <button
+  className="text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
   onClick={(e) => {
     e.stopPropagation(); // Empêche la propagation de l'événement
-    navigate(`/user/${message.user_id}`);
+    if (onUserClick) {
+      onUserClick(message.user_id);
+    } else {
+      navigate(`/user/${message.user_id}/messages`);
+    }
   }}
 >
   @{displayUsername}
-</span>
+</button>
 
                     {toast && (
   <div className={`fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-lg z-50 ${

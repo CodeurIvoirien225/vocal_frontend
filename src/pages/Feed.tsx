@@ -64,7 +64,7 @@ export default function Feed() {
         body: formData
       });
 
-      
+
       const data = await response.json();
       if (data.success) {
         fetchMessages();
@@ -265,6 +265,7 @@ export default function Feed() {
                 onReact={handleReact}
                 onComment={handleComment}
                 onReport={handleReport}
+                onUserClick={(userId) => navigate(`/user/${userId}/messages`)}
               />
             ))}
 
