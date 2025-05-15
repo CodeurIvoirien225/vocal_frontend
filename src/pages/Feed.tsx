@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, LogOut, Mic, BarChart2, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Bell, LogOut, Mic, BarChart2, Menu, X } from 'lucide-react';
 
 import { useAuth } from '../contexts/AuthContext';
 import { VocalMessage as VocalMessageType } from '../types';
@@ -14,8 +14,7 @@ export default function Feed() {
   const [isRecording, setIsRecording] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const messagesPerPage = 5;
+  const [displayCount, setDisplayCount] = useState(5); // Nombre initial de messages à afficher
 
   useEffect(() => {
     if (!user) {
@@ -44,11 +43,9 @@ export default function Feed() {
     }
   };
 
-  // Calcul des messages à afficher pour la page courante
-  const indexOfLastMessage = currentPage * messagesPerPage;
-  const indexOfFirstMessage = indexOfLastMessage - messagesPerPage;
-  const currentMessages = messages.slice(indexOfFirstMessage, indexOfLastMessage);
-  const totalPages = Math.ceil(messages.length / messagesPerPage);
+  const handleLoadMore = () => {
+    setDisplayCount(prev => prev + 5); // Augmente de 5 le nombre de messages affichés
+  };
 
   const handleAudioRecorded = async (blob: Blob, title: string) => {
     const formData = new FormData();
@@ -64,12 +61,9 @@ export default function Feed() {
         body: formData
       });
 
-
       const data = await response.json();
       if (data.success) {
         fetchMessages();
-        // Revenir à la première page après l'ajout d'un nouveau message
-        setCurrentPage(1);
       }
     } catch (err) {
       console.error('Error uploading audio:', err);
@@ -78,57 +72,57 @@ export default function Feed() {
 
   const handleReact = async (messageId: number, type: string) => {
     try {
-        const response = await fetch('https://p6-groupeb.com/abass/backend/api/reactions.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({
-                message_id: messageId,
-                type: type
-            })
-        });
+      const response = await fetch('https://p6-groupeb.com/abass/backend/api/reactions.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          message_id: messageId,
+          type: type
+        })
+      });
 
-        if (!response.ok) {
-            throw new Error('Erreur serveur');
-        }
+      if (!response.ok) {
+        throw new Error('Erreur serveur');
+      }
     } catch (error) {
-        console.error("Erreur:", error);
+      console.error("Erreur:", error);
     }
   };
 
   const handleComment = async (messageId: number, content: string, isAudio: boolean) => {
     try {
-        const response = await fetch('https://p6-groupeb.com/abass/backend/api/comments.php', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                message_id: messageId, 
-                content, 
-                is_audio: isAudio 
-            })
-        });
+      const response = await fetch('https://p6-groupeb.com/abass/backend/api/comments.php', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+          message_id: messageId, 
+          content, 
+          is_audio: isAudio 
+        })
+      });
 
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            throw new Error(`Réponse serveur invalide: ${text.substring(0, 100)}`);
-        }
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Réponse serveur invalide: ${text.substring(0, 100)}`);
+      }
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (!data.success) {
-            throw new Error(data.error || 'Erreur inconnue du serveur');
-        }
+      if (!data.success) {
+        throw new Error(data.error || 'Erreur inconnue du serveur');
+      }
 
-        fetchMessages();
+      fetchMessages();
     } catch (err) {
-        console.error('Error adding comment:', err);
-        alert('Erreur lors de l\'ajout du commentaire. Veuillez réessayer.');
+      console.error('Error adding comment:', err);
+      alert('Erreur lors de l\'ajout du commentaire. Veuillez réessayer.');
     }
   };
 
@@ -148,18 +142,6 @@ export default function Feed() {
       }
     } catch (err) {
       console.error('Error reporting message:', err);
-    }
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const goToPrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
     }
   };
 
@@ -255,10 +237,12 @@ export default function Feed() {
       </header>
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
         {loading ? (
-          <div>Chargement...</div>
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          </div>
         ) : (
           <div className="space-y-6">
-            {currentMessages.map((message) => (
+            {messages.slice(0, displayCount).map((message) => (
               <VocalMessage
                 key={message.id}
                 message={message}
@@ -269,29 +253,13 @@ export default function Feed() {
               />
             ))}
 
-            {/* Pagination */}
-            {messages.length > messagesPerPage && (
-              <div className="flex justify-between items-center mt-8">
+            {displayCount < messages.length && (
+              <div className="flex justify-center mt-8">
                 <button
-                  onClick={goToPrevPage}
-                  disabled={currentPage === 1}
-                  className={`flex items-center px-4 py-2 rounded-md ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed' : 'text-indigo-600 hover:bg-indigo-50'}`}
+                  onClick={handleLoadMore}
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors duration-200"
                 >
-                  <ChevronLeft className="h-5 w-5 mr-1" />
-                  Précédent
-                </button>
-                
-                <span className="text-gray-600">
-                  Page {currentPage} sur {totalPages}
-                </span>
-                
-                <button
-                  onClick={goToNextPage}
-                  disabled={currentPage === totalPages}
-                  className={`flex items-center px-4 py-2 rounded-md ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed' : 'text-indigo-600 hover:bg-indigo-50'}`}
-                >
-                  Suivant
-                  <ChevronRight className="h-5 w-5 ml-1" />
+                  Charger plus de messages
                 </button>
               </div>
             )}
